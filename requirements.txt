@@ -1,0 +1,3 @@
+flet
+requests
+SpeechRecognition==3.10.4
