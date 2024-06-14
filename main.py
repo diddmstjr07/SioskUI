@@ -4,6 +4,7 @@ import threading
 import time
 import random
 import os
+from auto.delete import delete_dot_underscore_files
 
 current_working_directory = os.getcwd()
 # print(current_working_directory)
@@ -151,4 +152,5 @@ def main(page: ft.Page):
     animate_containers(page, containers)
 
 if __name__ == "__main__":
+    delete_dot_underscore_files()
     ft.app(target=main)
