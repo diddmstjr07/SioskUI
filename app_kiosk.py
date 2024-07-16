@@ -11,6 +11,9 @@ current_working_directory = os.getcwd()
 drinks = ["Coffee", "Smoothe", "Beverage", "Tea", "Ade"]
 
 def main(page: ft.Page):
+    '''
+    Kiosk, Siosk UI Version
+    '''
     drink_items = [ 
         ("coffee/iceamericano.png", "아이스 아메리카노\n3000원", "Coffee"),
         ("coffee/younyu_latte.png", "연유 라테\n3000원", None),
