@@ -5,7 +5,7 @@ import random
 import time
 import ast
 import re
-from auto.delete import delete_dot_underscore_files
+import threading
 
 current_working_directory = os.getcwd()
 drinks = ["Coffee", "Smoothe", "Beverage", "Tea", "Ade"]
@@ -60,8 +60,8 @@ def main(page: ft.Page):
 
     img0 = ft.Image(
         src=f"{current_working_directory}/assets/images/logo/general.png",
-        width=200,
-        height=200,
+        width=300,
+        height=300,
         fit=ft.ImageFit.CONTAIN,
     )
 
@@ -74,8 +74,8 @@ def main(page: ft.Page):
 
     img1 = ft.Image(
         src=f"{current_working_directory}/assets/images/logo/siosk.png",
-        width=200,
-        height=200,
+        width=300,
+        height=300,
         fit=ft.ImageFit.CONTAIN,
     )
 
@@ -220,7 +220,7 @@ def main(page: ft.Page):
             ft.Container(
                 ft.Text(
                     text,
-                    size=text_size,
+                    size="20",
                     color=text_color,
                     font_family="NanumGothic",
                     weight=text_weight
@@ -278,7 +278,7 @@ def main(page: ft.Page):
                 alignment=ft.MainAxisAlignment.CENTER,
                 expand=True,
             ),
-            bgcolor='#e6d5b8',
+            bgcolor='#FFD700',
             height=3000,
             expand=True
         )
@@ -476,7 +476,7 @@ def main(page: ft.Page):
                         border=None,
                         border_radius=ft.border_radius.all(10),
                         margin=ft.margin.only(right=20),
-                        bgcolor='#E6D5B8',
+                        bgcolor='#FFD700',
                         on_click=payment_recheck
                     )
                 ]
@@ -518,7 +518,7 @@ def main(page: ft.Page):
             ]
         )
     
-    def build_siosk_order_view():
+    def build_siosk_order_view(page: ft.Page):
         def close_dlg(e):
             dlg_modal.open = False
             page.update()
@@ -570,12 +570,12 @@ def main(page: ft.Page):
             ft.Container(
                 ft.Text(
                     text,
-                    size=text_size,
+                    size="25",
                     color=text_color,
                     font_family="NanumGothic",
                     weight=text_weight
                 ),
-                ft.padding.only(bottom=30),
+                ft.padding.only(bottom=70),
                 on_click=lambda e, key=key: (orderment.scroll_to(key=key(), duration=1000) if key else None)
             ) for text, key in text_tuples
         ]
@@ -605,14 +605,14 @@ def main(page: ft.Page):
                         ft.Column(
                             [
                                 ft.Container(
-                                    ft.Icon(name=ft.icons.HOME_ROUNDED, size=40, color=text_color),
+                                    ft.Icon(name=ft.icons.HOME_ROUNDED, size=60, color=text_color),
                                     alignment=ft.alignment.center,
                                     on_click=start_menu_click
                                 ),
                                 ft.Container(
                                     ft.Text(
                                         "처음으로",
-                                        size=15,
+                                        size=25,
                                         color=text_color,
                                         font_family="NanumGothic",
                                         weight=text_weight
@@ -629,7 +629,7 @@ def main(page: ft.Page):
                 expand=True,
             ),
             bgcolor='#e6d5b8',
-            height=height_ele,
+            height=3000,
             expand=True
         )
 
@@ -697,7 +697,7 @@ def main(page: ft.Page):
                 # print(data_str)
                 list_result = ft.Text(
                     value=data_str + " " + data_price + f" x {data_int}",
-                    size=text_size,
+                    size="30",
                     color=text_color,
                     font_family="NanumGothic",
                     weight=text_weight,
@@ -707,7 +707,7 @@ def main(page: ft.Page):
                 order_list.update()
             sum_dataa = ft.Text(
                 value="  " + str(total) + "원",
-                size=text_size,
+                size="30",
                 color=text_color,
                 font_family="NanumGothic",
                 weight=text_weight,
@@ -742,14 +742,14 @@ def main(page: ft.Page):
             container = ft.Container(
                 ft.Image(
                     src=f"{current_working_directory}/assets/images/{image}",
-                    width=300,
-                    height=300,
+                    width=750,
+                    height=750,
                 ),
                 padding=ft.padding.only(top=20),
-                margin=ft.margin.only(top=20, left=21),
+                margin=ft.margin.only(top=50, left=30),
                 alignment=ft.alignment.top_left,
-                width=150,
-                height=220,
+                width=375,
+                height=550,
                 bgcolor='#ffffff',
                 border_radius=ft.border_radius.all(10),
                 shadow=ft.BoxShadow(
@@ -765,19 +765,19 @@ def main(page: ft.Page):
                 ft.Container(
                     ft.Text(
                         text,
-                        size=15,
+                        size=25,
                         color=text_color,
                         font_family="NanumGothic",
                         weight=text_weight,
                         text_align=ft.alignment.top_left
                     ),
-                    margin=ft.margin.only(left=25)
+                    margin=ft.margin.only(top=10, left=25)
                 )
             ])
 
         rows = []
-        for i in range(0, len(drink_items), 3):
-            menu_cols = [create_menu_item(*item) for item in drink_items[i:i+3]]
+        for i in range(0, len(drink_items), 2):
+            menu_cols = [create_menu_item(*item) for item in drink_items[i:i+2]]
             rows.append(ft.Row(menu_cols))
 
         sum = ft.Column(
@@ -805,8 +805,8 @@ def main(page: ft.Page):
                 [
                     ft.Container(
                         row_sum,
-                        width=340,
-                        height=100,
+                        width=610,
+                        height=180,
                         border=ft.border.all(4, color='#aba5a0'),
                         border_radius=ft.border_radius.all(10),
                         margin=ft.margin.only(left=10),
@@ -815,14 +815,14 @@ def main(page: ft.Page):
                     ft.Container(
                         ft.Text(
                             "결제하기",
-                            size=25,
+                            size=40,
                             color=text_color,
                             font_family="NanumGothic",
                             weight=text_weight,
                         ),
-                        padding=ft.padding.only(top=28, left=44),
-                        width=180,
-                        height=100,
+                        padding=ft.padding.only(top=60, left=33),
+                        width=220,
+                        height=180,
                         border=None,
                         border_radius=ft.border_radius.all(10),
                         margin=ft.margin.only(right=20),
@@ -831,8 +831,7 @@ def main(page: ft.Page):
                     )
                 ]
             ),
-            height=110,
-            width=width_ele - 150,
+            height=200,
             alignment=ft.alignment.center
         )
 
@@ -842,6 +841,51 @@ def main(page: ft.Page):
             expand=True
         )
 
+        def animate_containers(containers):
+            for container in containers:
+                page.add(container)  # 각 컨테이너를 페이지에 추가
+
+            def toggle_height():
+                while True:
+                    for container in containers:
+                        new_height = random.randint(50, 200)
+                        container.height = new_height
+                        page.update()  # 이제 안전하게 업데이트 가능
+                    time.sleep(0.5)
+            thread = threading.Thread(target=toggle_height)
+            thread.daemon = True
+            thread.start()
+
+        containers = [
+            ft.Container(
+                bgcolor=ft.colors.BLACK,
+                width=45,
+                height=90,
+                border_radius=ft.border_radius.all(30),
+                animate=ft.Animation(600, "easeInOut"),
+            ) for _ in range(4)
+        ]
+
+        centered_content = ft.Row(
+            controls=ft.Container(
+                containers,
+                expand=True
+            ),
+            alignment=ft.MainAxisAlignment.END,
+        )
+
+        column_content = ft.Column(
+            [
+                ft.Container(
+                    centered_content,
+                    margin=ft.margin.only(right=60, bottom=10),
+                    expand=True
+                ),
+            ],
+        )
+        
+        page.add(column_content)
+        animate_containers(containers)
         return View(
             route="/general_order",
             controls=[
@@ -851,7 +895,14 @@ def main(page: ft.Page):
                         ft.Container(
                             ft.Column(
                                 [
-                                    ft.Container(height=20),
+                                    ft.Container(
+                                        ft.Row(
+                                            controls=containers,
+                                            alignment=ft.MainAxisAlignment.END,
+                                        ),
+                                        margin=ft.margin.only(right=60),
+                                        height=230,
+                                    ),
                                     orderment,
                                     order_box
                                 ],
@@ -859,14 +910,16 @@ def main(page: ft.Page):
                             bgcolor='#fefcf6',
                             border=None,
                             alignment=ft.alignment.center,
-                            width=width_ele - 150
+                            padding=ft.padding.only(left=20),
+                            width=900,
                         ),
                     ],
                     spacing=0,
                     expand=True,
                 )
-            ]
+            ],
         )
+
 
     def build_payment_order_view():
         return View(
@@ -904,7 +957,7 @@ def main(page: ft.Page):
         elif page.route == "/general_order":
             page.views.append(build_general_order_view())
         elif page.route == "/siosk_order":
-            page.views.append(build_siosk_order_view())
+            page.views.append(build_siosk_order_view(page=page))
         elif page.route == "/payment_recheck":
             page.views.append(build_payment_order_view())
         page.update()
@@ -913,5 +966,4 @@ def main(page: ft.Page):
     page.go(page.route)
 
 if __name__ == "__main__":
-    delete_dot_underscore_files()
     ft.app(target=main)
