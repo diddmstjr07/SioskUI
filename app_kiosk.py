@@ -6,6 +6,10 @@ import time
 import ast
 import re
 import threading
+from playsound import playsound
+
+def alert():
+    playsound('assets/audio/pop.mp3')
 
 current_working_directory = os.getcwd()
 drinks = ["Coffee", "Smoothe", "Beverage", "Tea", "Ade"]
@@ -110,7 +114,7 @@ def main(page: ft.Page):
                 ft.Container(
                     shadowed_img0,
                     alignment=ft.alignment.center,
-                    on_click=lambda _: page.go('/general_order')
+                    on_click=lambda _: (page.go('/general_order'), alert())
                 ),
                 ft.Text(
                     "일반주문",
@@ -130,7 +134,7 @@ def main(page: ft.Page):
                 ft.Container(
                     shadowed_img1,
                     alignment=ft.alignment.center,
-                    on_click=lambda _: page.go('/siosk_order')
+                    on_click=lambda _: (page.go('/siosk_order'), alert)
                 ),
                 ft.Text(
                     "노인주문",
@@ -187,7 +191,7 @@ def main(page: ft.Page):
             actions=[
                 ft.TextButton(
                     "확인", 
-                    on_click=close_dlg,
+                    on_click=(close_dlg, alert),
                     style=ft.ButtonStyle(
                         color=ft.colors.BLACK,
                     )
@@ -229,7 +233,7 @@ def main(page: ft.Page):
                     weight=text_weight
                 ),
                 ft.padding.only(bottom=60),
-                on_click=lambda e, key=key: (orderment.scroll_to(key=key(), duration=1000) if key else None)
+                on_click=(lambda e, key=key: (orderment.scroll_to(key=key(), duration=1000) if key else None), alert)
             ) for text, key in text_tuples
         ]
 
@@ -260,7 +264,7 @@ def main(page: ft.Page):
                                 ft.Container(
                                     ft.Icon(name=ft.icons.HOME_ROUNDED, size=40, color=text_color),
                                     alignment=ft.alignment.center,
-                                    on_click=start_menu_click
+                                    on_click=(start_menu_click, alert)
                                 ),
                                 ft.Container(
                                     ft.Text(
@@ -409,7 +413,7 @@ def main(page: ft.Page):
                     blur_radius=10,
                     offset=ft.Offset(0, 3)
                 ),
-                on_click=on_click_handler,
+                on_click=(on_click_handler, alert),
                 key=key if key else None
             )
             container.data = text  
@@ -480,7 +484,7 @@ def main(page: ft.Page):
                         border_radius=ft.border_radius.all(10),
                         margin=ft.margin.only(right=20),
                         bgcolor='#FFD700',
-                        on_click=payment_recheck
+                        on_click=(payment_recheck, alert)
                     )
                 ]
             ),
@@ -537,7 +541,7 @@ def main(page: ft.Page):
             actions=[
                 ft.TextButton(
                     "확인", 
-                    on_click=close_dlg,
+                    on_click=(close_dlg, alert),
                     style=ft.ButtonStyle(
                         color=ft.colors.BLACK,
                     )
@@ -579,7 +583,7 @@ def main(page: ft.Page):
                     weight=text_weight
                 ),
                 ft.padding.only(bottom=70),
-                on_click=lambda e, key=key: (orderment.scroll_to(key=key(), duration=1000) if key else None)
+                on_click=(lambda e, key=key: (orderment.scroll_to(key=key(), duration=1000) if key else None), alert)
             ) for text, key in text_tuples
         ]
 
@@ -610,7 +614,7 @@ def main(page: ft.Page):
                                 ft.Container(
                                     ft.Icon(name=ft.icons.HOME_ROUNDED, size=60, color=text_color),
                                     alignment=ft.alignment.center,
-                                    on_click=start_menu_click
+                                    on_click=(start_menu_click, alert)
                                 ),
                                 ft.Container(
                                     ft.Text(
@@ -759,7 +763,7 @@ def main(page: ft.Page):
                     blur_radius=10,
                     offset=ft.Offset(0, 3)
                 ),
-                on_click=on_click_handler,
+                on_click=(on_click_handler, alert),
                 key=key if key else None
             )
             container.data = text  
@@ -830,7 +834,7 @@ def main(page: ft.Page):
                         border_radius=ft.border_radius.all(10),
                         margin=ft.margin.only(right=20),
                         bgcolor='#E6D5B8',
-                        on_click=payment_recheck
+                        on_click=(payment_recheck, alert)
                     )
                 ]
             ),
@@ -943,7 +947,7 @@ def main(page: ft.Page):
                         alignment=ft.alignment.center,
                         width=100,
                         height=50,
-                        on_click=lambda _: page.go('/general_order'),
+                        on_click=(lambda _: page.go('/general_order'), alert),
                         bgcolor=ft.colors.BLUE_100, 
                         border_radius=15
                     ),
