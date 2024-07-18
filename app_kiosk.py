@@ -6,60 +6,42 @@ import time
 import ast
 import re
 import threading
-from playsound import playsound
+from reciept import connection
+# from playsound import playsound
 
-def alert():
-    playsound('assets/audio/pop.mp3')
+# def alert():
+#     sound = threading.Thread(playsound('assets/audio/pop.mp3'))
+#     sound.start()
 
 current_working_directory = os.getcwd()
 drinks = ["Coffee", "Smoothe", "Beverage", "Tea", "Ade"]
+connection_class = connection()
 
 def main(page: ft.Page):
     '''
     Kiosk, Siosk UI Version
     '''
-    drink_items = [ 
-        ("coffee/iceamericano.png", "아이스 아메리카노\n3000원", "Coffee"),
-        ("coffee/younyu_latte.png", "연유 라테\n3000원", None),
-        ("coffee/kapuchino.png", "카푸치노\n3000원", None),
-        ("coffee/Hazelnut_Latte.png", "헤이즐넛 라테\n3000원", None),
-        ("coffee/Hazelnut_Americano.png", "헤이즐넛 아메리카노\n3000원", None),
-        ("coffee/Coldbrew_Latte.png", "콜드브루 라테\n3000원", None),
-        ("coffee/cold_brew_original.png", "콜드브루\n3000원", None),
-        ("coffee/Caramel_Macchiato.png", "카라멜 마키아또\n3000원", None),
-        ("coffee/Caffe_Mocha.png", "카페 모카\n3000원", None),
-        ("frappe/Mint_Frappe.png", "민트 프라페\n3000원", None),
-        ("frappe/Green_Tea_Frappe.png", "녹차 프라페\n3000원", "Smoothe"),
-        ("frappe/Unicorn_Frappe.png", "유니콘 프라페\n3000원", None),
-        ("pongcrush/Banana_Pongcrush.png", "바나나 퐁크러쉬\n3000원", "Beverage"),
-        ("pongcrush/Chocolate_Honey_Pong_Crush.png", "초콜릿허니 퐁크러쉬\n3000원", None),
-        ("pongcrush/Choux_Cream_Honey_Pong_Crush.png", "슈크림허니 퐁크러쉬\n3000원", None),
-        ("pongcrush/Plain_Pongcrush.png", "플래인 퐁크러쉬\n3000원", None),
-        ("pongcrush/Strawberry_pongcrush.png", "딸기 퐁크러쉬\n3000원", None),
-        ("pongcrush/Strawberry_Cookie_Frappe.png", "딸기쿠키 프라페\n3000원", None),
-        ("smoothie/Mango_Yogurt_Smoothie.png", "망고요거트 스무디\n3000원", None),
-        ("smoothie/Plain_Yogurt_Smoothie.png", "플래인요거트 스무디\n3000원", None),
-        ("smoothie/Strawberry_Yogurt_Smoothie.png", "딸기요거트 스무디\n3000원", None),
-        ("ade/Blue_Lemon_Ade.png", "블루 레몬에이드\n3000원", "Ade"),
-        ("ade/Cherry_Coke.png", "체리콕\n3000원", None),
-        ("ade/Grapefruit_Ade.png", "자몽 에이드\n3000원", None),
-        ("ade/Lemon_Ade.png", "레몬 에이드\n3000원", None),
-        ("ade/Lime_Mojito.png", "라임 모히또\n3000원", None),
-        ("ade/MEGA_Ade.png", "메가 에이드\n3000원", None),
-        ("tea/Hot_lemon_tea.png", "레몬차\n3000원", None),
-        ("tea/Applecitron_Tea.png", "사과 유자차\n3000원", "Tea"),
-        ("tea/Chamomile.png", "케모마일 차\n3000원", None),
-        ("tea/Green_Tea.png", "녹차\n3000원", None),
-        ("tea/Earl_Grey.png", "얼그레이\n3000원", None),
-        ("tea/Hot_Grapefruit_tea.png", "자몽차\n3000원", None),
-    ]
     MENU = []
     Menu = []
     key_data = []
     data_arrange = []
+    drink_items = [ 
+        ("icons/4.png", "아이스 콜드브루\n4000원", "Coffee"),
+        ("icons/1.png", "콜드브루\n4000원", None),
+        ("icons/6.png", "오렌지 주스\n4000원", "Beverage"),
+        ("icons/5.png", "사과 주스\n4000원", None),
+        ("icons/7.png", "카모마일\n4000원", "Tea"),
+        ("icons/10.png", "유기농 귤피차\n4000원", None),
+        ("icons/11.png", "레몬차\n6000원", None),
+        ("icons/9.png", "자몽차\n6000원", None),
+        ("icons/8.png", "레몬에이드\n6500원", "Ade"),
+        ("icons/3.png", "자몽에이드\n6500원", "Ade"),
+        ("icons/2.png", "쿠키\n5000원", ""),
+    ]
     page.title = "시오스크"
     page.window_width = 700
     page.window_height = 1600
+    # route_history = []
 
     page.fonts = {
         "NanumGothic": "fonts/NanumGothic-Bold.ttf"
@@ -91,7 +73,7 @@ def main(page: ft.Page):
         padding=10
     )
 
-    def store_getting_lowdata(e, low_data): 
+    def store_getting_lowdata(e, low_data):  # 로우 데이터 Insult를 하거나, Gettig(Polling)을 해주는 함수
         if e == 0:
             data_arrange.clear()
             data_arrange.append(low_data)
@@ -104,7 +86,9 @@ def main(page: ft.Page):
                 print(data_arrange[0])
                 return data_arrange[0]
             except IndexError:
-                os._exit(0)
+                return None # 이부분은 개발이 완료되어지면 보안을 위해서 꼭 os._exit(0)으로 변환해주어야함.
+            except Exception as e:
+                print(e)
         else:
             os._exit(0)
 
@@ -114,7 +98,7 @@ def main(page: ft.Page):
                 ft.Container(
                     shadowed_img0,
                     alignment=ft.alignment.center,
-                    on_click=lambda _: (page.go('/general_order'), alert())
+                    on_click=lambda _: page.go('/general_order')
                 ),
                 ft.Text(
                     "일반주문",
@@ -134,7 +118,7 @@ def main(page: ft.Page):
                 ft.Container(
                     shadowed_img1,
                     alignment=ft.alignment.center,
-                    on_click=lambda _: (page.go('/siosk_order'), alert)
+                    on_click=lambda _: page.go('/siosk_order')
                 ),
                 ft.Text(
                     "노인주문",
@@ -154,6 +138,9 @@ def main(page: ft.Page):
             controls=[
                 ft.Row(
                     [
+                        # ft.Container(
+                        #     ft.TextButton("admin", on_click=lambda _:page.go("/admininstrator_page")),
+                        # ),
                         ft.Container(
                             content0,
                             bgcolor='#fefcf6',
@@ -191,7 +178,7 @@ def main(page: ft.Page):
             actions=[
                 ft.TextButton(
                     "확인", 
-                    on_click=(close_dlg, alert),
+                    on_click=close_dlg,
                     style=ft.ButtonStyle(
                         color=ft.colors.BLACK,
                     )
@@ -233,7 +220,7 @@ def main(page: ft.Page):
                     weight=text_weight
                 ),
                 ft.padding.only(bottom=60),
-                on_click=(lambda e, key=key: (orderment.scroll_to(key=key(), duration=1000) if key else None), alert)
+                on_click=(lambda e, key=key: orderment.scroll_to(key=key(), duration=1000) if key else None)
             ) for text, key in text_tuples
         ]
 
@@ -244,15 +231,15 @@ def main(page: ft.Page):
         )
 
         def start_menu_click(e):
+            print("\nData Initing -> Client Pressed home button")
+            print("------------------------------------------")
+            print(data_arrange)
+            print("------------------------------------------\n")
             MENU.clear()
             Menu.clear()
+            key_data.clear()
+            data_arrange.clear()
             page.go('/')
-        
-        def payment_recheck(e):
-            if Menu == []:
-                open_dlg_modal(e)
-            else:
-                page.go('/payment_recheck')
         
         display = ft.Container(
             ft.Column(
@@ -264,7 +251,7 @@ def main(page: ft.Page):
                                 ft.Container(
                                     ft.Icon(name=ft.icons.HOME_ROUNDED, size=40, color=text_color),
                                     alignment=ft.alignment.center,
-                                    on_click=(start_menu_click, alert)
+                                    on_click=start_menu_click
                                 ),
                                 ft.Container(
                                     ft.Text(
@@ -325,8 +312,8 @@ def main(page: ft.Page):
                             if updated == "":
                                 menu_data = f"{item} | 1 | {str(match.group(0).split(item)[1])[1:]}"
                                 amount_menus.append(menu_data)
-            print(amount_menus)
-            store_getting_lowdata(0, amount_menus)
+            # print(amount_menus)
+            store_getting_lowdata(0, amount_menus) # 데이터를 삽입하도록 호출
             return amount_menus
 
         def on_click_handler(e):
@@ -395,6 +382,12 @@ def main(page: ft.Page):
                 env.update()
                 time.sleep(0.005)
 
+        def submit(e): # e 값을 받아서 open_dlg_model을 호출하자 -> Kiosk에 대해서
+            if len(data_arrange) != 0: # data_arrange는 최종적으로 메뉴를 포함하고 있는 배열의 정보이다. 
+                page.go('/from_general_order') # 이부분은 결제하기를 눌렀을때 나오는 페이지를 뜻함
+            elif len(data_arrange) == 0:
+                open_dlg_modal(e) # 0개인 경우에는 alert함수 호출
+
         def create_menu_item(image, text, key):
             container = ft.Container(
                 ft.Image(
@@ -413,7 +406,7 @@ def main(page: ft.Page):
                     blur_radius=10,
                     offset=ft.Offset(0, 3)
                 ),
-                on_click=(on_click_handler, alert),
+                on_click=on_click_handler,
                 key=key if key else None
             )
             container.data = text  
@@ -484,7 +477,7 @@ def main(page: ft.Page):
                         border_radius=ft.border_radius.all(10),
                         margin=ft.margin.only(right=20),
                         bgcolor='#FFD700',
-                        on_click=(payment_recheck, alert)
+                        on_click=submit # 메뉴가 있는지 확인하는 함수에 있어서 e를 받기 위해서는 함수 그대로를 호출해주어야한다.
                     )
                 ]
             ),
@@ -541,7 +534,7 @@ def main(page: ft.Page):
             actions=[
                 ft.TextButton(
                     "확인", 
-                    on_click=(close_dlg, alert),
+                    on_click=close_dlg,
                     style=ft.ButtonStyle(
                         color=ft.colors.BLACK,
                     )
@@ -583,7 +576,7 @@ def main(page: ft.Page):
                     weight=text_weight
                 ),
                 ft.padding.only(bottom=70),
-                on_click=(lambda e, key=key: (orderment.scroll_to(key=key(), duration=1000) if key else None), alert)
+                on_click=lambda e, key=key: (orderment.scroll_to(key=key(), duration=1000) if key else None)
             ) for text, key in text_tuples
         ]
 
@@ -598,12 +591,6 @@ def main(page: ft.Page):
             Menu.clear()
             page.go('/')
         
-        def payment_recheck(e):
-            if Menu == []:
-                open_dlg_modal(e)
-            else:
-                page.go('/payment_recheck')
-        
         display = ft.Container(
             ft.Column(
                 [
@@ -614,7 +601,7 @@ def main(page: ft.Page):
                                 ft.Container(
                                     ft.Icon(name=ft.icons.HOME_ROUNDED, size=60, color=text_color),
                                     alignment=ft.alignment.center,
-                                    on_click=(start_menu_click, alert)
+                                    on_click=start_menu_click
                                 ),
                                 ft.Container(
                                     ft.Text(
@@ -676,7 +663,7 @@ def main(page: ft.Page):
                                 menu_data = f"{item} | 1 | {str(match.group(0).split(item)[1])[1:]}"
                                 amount_menus.append(menu_data)
             print(amount_menus)
-            store_getting_lowdata(0, amount_menus)
+            store_getting_lowdata(0, amount_menus) # 데이터를 삽입하도록 호출 -> 시오스크
             return amount_menus
 
         def on_click_handler(e):
@@ -744,6 +731,12 @@ def main(page: ft.Page):
                 env.shadow = ft.BoxShadow(blur_radius=10, offset=offset)
                 env.update()
                 time.sleep(0.005)
+                
+        def submit(e): # e 값을 받아서 open_dlg_model을 호출하자 -> Siosk에 대해서
+            if len(data_arrange) != 0: # data_arrange는 최종적으로 메뉴를 포함하고 있는 배열의 정보이다. 
+                page.go('/from_siosk_order') # 이부분은 결제하기를 눌렀을때 나오는 페이지를 뜻함
+            elif len(data_arrange) == 0:
+                open_dlg_modal(e) # 0개인 경우에는 alert함수 호출
 
         def create_menu_item(image, text, key):
             container = ft.Container(
@@ -763,7 +756,7 @@ def main(page: ft.Page):
                     blur_radius=10,
                     offset=ft.Offset(0, 3)
                 ),
-                on_click=(on_click_handler, alert),
+                on_click=on_click_handler,
                 key=key if key else None
             )
             container.data = text  
@@ -814,8 +807,9 @@ def main(page: ft.Page):
                         row_sum,
                         width=610,
                         height=180,
+
                         border=ft.border.all(4, color='#aba5a0'),
-                        border_radius=ft.border_radius.all(10),
+                        border_radius=ft.border_radius.all(20),
                         margin=ft.margin.only(left=10),
                         padding=ft.padding.only(top=15, bottom=15, left=20, right=20)
                     ),
@@ -831,10 +825,10 @@ def main(page: ft.Page):
                         width=220,
                         height=180,
                         border=None,
-                        border_radius=ft.border_radius.all(10),
+                        border_radius=ft.border_radius.all(20),
                         margin=ft.margin.only(right=20),
                         bgcolor='#E6D5B8',
-                        on_click=(payment_recheck, alert)
+                        on_click=submit # 메뉴가 있는지 확인하는 함수에 있어서 e를 받기 위해서는 함수 그대로를 호출해주어야한다.
                     )
                 ]
             ),
@@ -926,33 +920,384 @@ def main(page: ft.Page):
                 )
             ],
         )
-
-
+    
+    # store_getting_lowdata(1, None) 주문했던걸 반환해줌
     def build_payment_order_view():
+        # if route_history[0] == "/general_order":
+        future_route = "/general_order"
+        # route_history.clear()
+    
+    def from_general_order():
         return View(
-            route="/payment_recheck",
+            route="/from_siosk_order",
             controls=[
                 ft.Container(
-                    ft.Text(
-                        store_getting_lowdata(1, None),
-                    ),
+                    ft.Text("Hello Fucking World")
                 ),
                 ft.Container(
-                    ft.Container(
-                        ft.Text(
-                            "돌아가기",
-                            font_family="NanumGothic",
-                            color=ft.colors.BLACK,
-                        ),
-                        alignment=ft.alignment.center,
-                        width=100,
-                        height=50,
-                        on_click=(lambda _: page.go('/general_order'), alert),
-                        bgcolor=ft.colors.BLUE_100, 
-                        border_radius=15
+                    ft.TextButton("movement to Administrator Page", on_click=lambda _:page.go("/admininstrator_page"))
+                )
+            ]
+        )
+    
+    def from_siosk_order():
+        def background_function(column_content, containers): # Background Process Threading 등등
+            page.add(column_content) # 에니매이션 처리
+            animate_containers(containers) # 에니매이션 처리
+            result = store_getting_lowdata(1, None) # 삽입되어진 값들을 호출 -> 키오스크
+            names, amounts, prices, images = get_picture_link() # Picture Link를 받아오는 함수로써 이름, 양, 이미지 경로를 받아오는 역할을 한다.
+            for beverage_index, beverage_val in enumerate(names):
+                table_format = f"| {names[beverage_index]} | {amounts[beverage_index]} | {prices[beverage_index]} | {images[beverage_index]} |"
+                print(table_format)
+            return names, amounts, prices, images
+
+        def get_price_by_name(drink_name, drink_items): # 이름을 활용해서 이미지 경로 배열에서 이미지 경로를 추출
+            for image, name_price, category in drink_items: # for 문으로 검사
+                name, price = name_price.split("\n")  # 이름과 가격 분리
+                if name == drink_name:
+                    return image
+            return -1  
+
+        def prettier_order_array(e):
+            try:
+                name = str(data_arrange[0][e]).split(' | ')[0]
+                amount = str(data_arrange[0][e]).split(' | ')[1]
+                price = str(data_arrange[0][e]).split(' | ')[2]
+                return name, amount, price
+            except IndexError:
+                print("Please add least fake array valument")
+
+        def get_picture_link():
+            names = []
+            amounts = []
+            prices = []
+            images = []
+            for data_arrange_index, data_arrange_val in enumerate(data_arrange[0]):
+                name, amount, price = prettier_order_array(data_arrange_index)
+                image = get_price_by_name(name, drink_items=drink_items)
+                names.append(name)
+                amounts.append(amount)
+                prices.append(price) 
+                images.append(image)
+            return names, amounts, prices, images
+
+        def animate_containers(containers):
+            for container in containers:
+                page.add(container)  # 각 컨테이너를 페이지에 추가
+
+            def toggle_height():
+                while True:
+                    for container in containers:
+                        new_height = random.randint(50, 200)
+                        container.height = new_height
+                        page.update()  # 이제 안전하게 업데이트 가능
+                    time.sleep(0.5)
+            thread = threading.Thread(target=toggle_height)
+            thread.daemon = True
+            thread.start()
+
+        containers = [
+            ft.Container(
+                bgcolor=ft.colors.BLACK,
+                width=45,
+                height=90,
+                border_radius=ft.border_radius.all(30),
+                animate=ft.Animation(600, "easeInOut"),
+            ) for _ in range(4)
+        ]
+
+        centered_content = ft.Row(
+            controls=ft.Container(
+                containers,
+                expand=True
+            ),
+            alignment=ft.MainAxisAlignment.END,
+        )
+
+        column_content = ft.Column(
+            [
+                ft.Container(
+                    centered_content,
+                ),
+            ],
+        )
+        
+        names, amounts, prices, images = background_function(column_content=column_content, containers=containers)
+        
+        def total_amount():
+            sum_data = []
+            for beverage_sum_index, beverage_sum_val in enumerate(names):
+                price_total = int(amounts[beverage_sum_index]) * int(str(prices[beverage_sum_index])[:-1])
+                sum_data.append(price_total)
+            return sum_data, sum(sum_data)
+
+        def creating_containers():
+            elements = []
+            def update_amount(e, name, change):
+                print(name)
+                print(names.index(name))
+                print(amounts)
+                amounts[int(names.index(name))] = int(amounts[int(names.index(name))]) + change
+                page.update()
+
+            for beverage_final_index, beverage_final_val in enumerate(names):
+                
+                element = ft.Container(
+                    ft.Row(
+                        [
+                            ft.Container(
+                                ft.Image(
+                                    src=f"{current_working_directory}/assets/images/{images[beverage_final_index]}",
+                                    width=400,
+                                    height=400,
+                                    fit=ft.ImageFit.CONTAIN,
+                                ),
+                                width=300,
+                                height=400,
+                                border_radius=ft.border_radius.all(10),
+                                shadow=ft.BoxShadow(
+                                    blur_radius=10,
+                                    offset=ft.Offset(0, 3)
+                                ),
+                                margin=ft.margin.only(left=40, bottom=20, top=10),
+                                bgcolor='#ffffff',
+                            ),
+                            ft.Container(
+                                ft.Column( 
+                                    [
+                                        ft.Text(
+                                            names[beverage_final_index],
+                                            size=30,
+                                            text_align=ft.TextAlign.CENTER,
+                                            color=ft.colors.BLACK,
+                                            font_family="NanumGothic"
+                                        ),
+                                        ft.Text(
+                                            prices[beverage_final_index],
+                                            size=30,
+                                            text_align=ft.TextAlign.CENTER,
+                                            color=ft.colors.BLACK,
+                                            font_family="NanumGothic"
+                                        ),
+                                    ],
+                                ),
+                                width=300,
+                                margin=ft.margin.only(left=50)
+                            ),
+                            ft.Container(
+                                ft.Row(
+                                    [
+                                        ft.IconButton(
+                                            ft.icons.REMOVE,
+                                            icon_color=ft.colors.BLACK,
+                                            # on_click=lambda e: update_amount(e, names[beverage_final_index], -1)
+                                        ),
+                                        ft.Text(
+                                            value=amounts[int(names.index(names[beverage_final_index]))],
+                                            size=20, 
+                                            text_align=ft.TextAlign.CENTER, 
+                                            color=ft.colors.BLACK,
+                                            width=40,
+                                            font_family="NanumGothic",
+                                        ),
+                                        ft.IconButton(
+                                            ft.icons.ADD,
+                                            icon_color=ft.colors.BLACK,
+                                            # on_click=lambda e: update_amount(e, names[beverage_final_index], 1)
+                                        ),
+                                    ],
+                                    alignment=ft.MainAxisAlignment.CENTER,
+                                ),
+                                width=200,
+                                border=ft.border.all(5, "#999999"),
+                                border_radius=9
+                            ),
+                        ],
+                        spacing=0
+                    )
+                )
+                elements.append(element)
+            return elements
+        
+        money_list, money_sum = total_amount()
+        money_sum = "{:,}원".format(money_sum)
+        elements_array = creating_containers()
+        text_color = "#55443d"
+        text_weight = ft.FontWeight.W_900
+
+        return View(
+            route="/from_general_order",
+            controls=[
+                ft.Container(
+                    ft.Column(
+                        [
+                            ft.Container(
+                                ft.Row(
+                                    [
+                                        ft.Container(
+                                            ft.Text(
+                                                "주문을 확인해주세요.",
+                                                size=35,
+                                                text_align=ft.TextAlign.CENTER,
+                                                color=ft.colors.BLACK,
+                                                font_family="NanumGothic"
+                                            ),
+                                            ft.margin.only(left=40, right=400, top=100),
+                                        ),
+                                        ft.Container(
+                                            ft.Row(
+                                                controls=containers,
+                                            ),
+                                            margin=ft.margin.only(right=60),
+                                            height=300
+                                        ),
+                                    ]
+                                ),
+                                bgcolor=ft.colors.WHITE,
+                            ),
+                            ft.Container(
+                                ft.Column(
+                                    controls=elements_array,
+                                    scroll='always',
+                                ),
+                                height=1300,
+                                bgcolor=ft.colors.WHITE,
+                            ),
+                            ft.Container(
+                                ft.Row(
+                                    [
+                                        ft.Container(
+                                            ft.Row(
+                                                [
+                                                    ft.Text(
+                                                        f"총 금액:",
+                                                        size=40,
+                                                        color=text_color,
+                                                        font_family="NanumGothic",
+                                                        weight=text_weight,
+                                                    ),
+                                                    ft.Text(
+                                                        money_sum,
+                                                        size=40,
+                                                        color=text_color,
+                                                        font_family="NanumGothic",
+                                                        weight=text_weight,
+                                                    ),
+                                                ],
+                                                alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
+                                            ),
+                                            width=510,
+                                            height=180,
+                                            border=ft.border.all(5, color='#aba5a0'),
+                                            border_radius=ft.border_radius.all(20),
+                                            margin=ft.margin.only(left=10),
+                                            padding=ft.padding.only(top=15, bottom=15, left=20, right=20)
+                                        ),
+                                        ft.Container(
+                                            ft.Text(
+                                                "메뉴",
+                                                size=40,
+                                                color=text_color,
+                                                font_family="NanumGothic",
+                                                weight=text_weight,
+                                            ),
+                                            width=200,
+                                            height=180,
+                                            border=ft.border.all(5, color='#aba5a0'),
+                                            border_radius=ft.border_radius.all(20),
+                                            margin=ft.margin.only(left=10),
+                                            padding=ft.padding.only(top=55, bottom=15, left=57, right=20),
+                                            on_click=lambda _: page.go('/siosk_order')
+                                        ),
+                                        ft.Container(
+                                            ft.Text(
+                                                "결제하기",
+                                                size=40,
+                                                color=text_color,
+                                                font_family="NanumGothic",
+                                                weight=text_weight,
+                                            ),
+                                            padding=ft.padding.only(top=60, left=70),
+                                            width=290,
+                                            height=180,
+                                            border=None,
+                                            border_radius=ft.border_radius.all(20),
+                                            margin=ft.margin.only(left=10),
+                                            bgcolor='#E6D5B8',
+                                            on_click=lambda _:connection_class.print(names, amounts, prices)
+                                        )
+                                    ]
+                                ),
+                                height=200,
+                                alignment=ft.alignment.center,
+                                margin=ft.margin.only(top=60)
+                            )
+                            # ft.Container(
+                            #     ft.TextButton("/admininstrator_page", on_click=lambda _: page.go('/admininstrator_page')),
+                            #     bgcolor=ft.colors.WHITE,
+                            # ),
+                        ],
+                        spacing=0
                     ),
-                    alignment=ft.alignment.bottom_right,
-                    expand=True
+                    width=10000,
+                    height=10000,
+                    bgcolor=ft.colors.WHITE
+                )
+            ],
+        )
+
+    def administrator_page():
+        def initing():
+            print("\nData Initing -> Client Pressed home button")
+            print("------------------------------------------")
+            print(data_arrange)
+            print("------------------------------------------\n")
+            MENU.clear()
+            Menu.clear()
+            data_arrange.clear()
+
+        def adding(e):
+            try:
+                amount = str(data_arrange[0][0]).split(' | ')[1]
+                data_arrange.clear()
+                temp_fake_array = []
+                temp_fake_array.append(f'카페 모카 | {int(amount) + 1} | 3000원')
+                data_arrange.append(temp_fake_array)
+                print("data insulting")
+                print(data_arrange)
+            except IndexError:
+                temp_fake_array = []
+                temp_fake_array.append(f'카페 모카 | {e} | 3000원')
+                data_arrange.append(temp_fake_array)
+                print("data insulting")
+                print(data_arrange)
+
+        return View(
+            route="/admininstrator_page",
+            controls=[
+                ft.Container(
+                    height=1000
+                ),
+                ft.Container(
+                    ft.TextButton("/", on_click=lambda _:page.go("/")) # lamba를 쓰는 이유는 즉석 Function을 만들어내기 위함에 있음, 즉시 함수를 생성하여 Onclick 넣어주기
+                ),
+                ft.Container(
+                    ft.TextButton("/general_order", on_click=lambda _:page.go("/general_order"))
+                ),
+                ft.Container(
+                    ft.TextButton("/siosk_order", on_click=lambda _:page.go("/siosk_order"))
+                ),
+                ft.Container(
+                    ft.TextButton("/from_general_order", on_click=lambda _:page.go("/from_general_order"))
+                ),
+                ft.Container(
+                    ft.TextButton("/from_siosk_order", on_click=lambda _:page.go("/from_siosk_order"))
+                ),
+                ft.Container(
+                    ft.TextButton("Initing", on_click=lambda _: initing())
+                ),
+                ft.Container(
+                    ft.TextButton("Adding", on_click=lambda _: adding(1))
                 )
             ]
         )
@@ -965,8 +1310,12 @@ def main(page: ft.Page):
             page.views.append(build_general_order_view())
         elif page.route == "/siosk_order":
             page.views.append(build_siosk_order_view(page=page))
-        elif page.route == "/payment_recheck":
-            page.views.append(build_payment_order_view())
+        elif page.route == "/admininstrator_page":
+            page.views.append(administrator_page())
+        elif page.route == "/from_general_order":
+            page.views.append(from_general_order())
+        elif page.route == "/from_siosk_order":
+            page.views.append(from_siosk_order())
         page.update()
 
     page.on_route_change = route_change
