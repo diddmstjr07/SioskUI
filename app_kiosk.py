@@ -6,7 +6,6 @@ import time
 import ast
 import re
 import threading
-from reciept import connection
 import requests
 # from playsound import playsound
 
@@ -16,7 +15,6 @@ import requests
 
 current_working_directory = os.getcwd()
 drinks = ["Coffee", "Smoothe", "Beverage", "Tea", "Ade"]
-connection_class = connection()
 
 def main(page: ft.Page):
     '''
