@@ -7,6 +7,7 @@ import ast
 import re
 import threading
 from reciept import connection
+import requests
 # from playsound import playsound
 
 # def alert():
@@ -1125,6 +1126,9 @@ def main(page: ft.Page):
         text_color = "#55443d"
         text_weight = ft.FontWeight.W_900
 
+        def connection():
+            requests.get("127.0.0.7:9460", params={'names': names, 'amounts': amounts, 'prices': prices})
+
         return View(
             route="/from_general_order",
             controls=[
@@ -1224,7 +1228,7 @@ def main(page: ft.Page):
                                             border_radius=ft.border_radius.all(20),
                                             margin=ft.margin.only(left=10),
                                             bgcolor='#E6D5B8',
-                                            on_click=lambda _:connection_class.print(names, amounts, prices)
+                                            on_click=lambda _:connection
                                         )
                                     ]
                                 ),
