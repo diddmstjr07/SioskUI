@@ -29,6 +29,7 @@ def main(page: ft.Page):
         ("icons/1.png", "콜드브루\n4000원", None),
         ("icons/6.png", "오렌지 주스\n4000원", "Beverage"),
         ("icons/5.png", "사과 주스\n4000원", None),
+        ("icons/12.png", "수박주스\n5000원", None),
         ("icons/7.png", "카모마일\n4000원", "Tea"),
         ("icons/10.png", "유기농 귤피차\n4000원", None),
         ("icons/11.png", "레몬차\n6000원", None),
