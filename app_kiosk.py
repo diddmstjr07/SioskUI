@@ -26,30 +26,84 @@ class UI:
     def __init__(self) -> None:
         self.TextToSpeech = TextToSpeech()
         while True:
-            bool = input("Initing audio dataset? (Y/N): ")
-            if bool == "Y" or bool == "y" or bool == "Yes" or bool == "y":
+            bool = input("Korean or English (한국어, 영어)? (K/E): ")
+            if bool == "K" or bool == "k" or bool == "한국어" or bool == "Korean" or bool == "korean":
                 os.system(clear_terminal())
-                asyncio.run(self.TextToSpeech.downloading())
+                while True:
+                    bool = input("시오스크 서버가(SioskServer) 본인 PC에서 실행중인가요? (Y/N): ")
+                    if bool == "Y" or bool == "y" or bool == "Yes" or bool == "y":
+                        ip_address = "127.0.0.1"
+                        os.system(clear_terminal())
+                        break
+                    elif bool == "N" or bool == "n" or bool == "No" or bool == "no":
+                        os.system(clear_terminal())
+                        ip_address = input('\033[91m' + "[!중요!] " + '\033[0m' + "시오스크서버와 클라이언트 코드가 동일한 네트워크에 접속되어있어야합니다(와이파이)\n시오스크서버가(SioskServer) 실행중인 아이피 주소를 입력해주십시오. \n\nWindows인 경우, ipconfig \nMac OS인 경우, ifconfig\n\n새창 터미널에 입력하여 나온 192.168~~ 아이피 주소를 입력해주세요: ")
+                        break
+                    else:
+                        print("Y 또는 N만 입력해주십시오")
+                while True:
+                    bool = input("TTS 오디오 초기화를 진행할까요? (Y 입력 권장) (Y/N): ")
+                    if bool == "Y" or bool == "y" or bool == "Yes" or bool == "y":
+                        os.system(clear_terminal())
+                        asyncio.run(self.TextToSpeech.downloading())
+                        break
+                    elif bool == "N" or bool == "n" or bool == "No" or bool == "no":
+                        os.system(clear_terminal())
+                        break
+                    else:
+                        print("Please enter keyword Only Y or N")
+                        os.system(clear_terminal())
                 break
-            elif bool == "N" or bool == "n" or bool == "No" or bool == "no":
+
+            elif bool == "E" or bool == "e" or bool == "English" or bool == "english" or bool == "영어":
                 os.system(clear_terminal())
+                while True:
+                    bool = input("Is SioskServer is Running on your own PC? (Y/N): ")
+                    if bool == "Y" or bool == "y" or bool == "Yes" or bool == "y":
+                        ip_address = "127.0.0.1"
+                        os.system(clear_terminal())
+                        break
+                    elif bool == "N" or bool == "n" or bool == "No" or bool == "no":
+                        ip_address = input('\033[91m' + "[!IMPORTANT!] " + '\033[0m' + "Your Server and Client must be connected in same Network device (WIFI)\nlease type IP Address SioskServer is running. \n\nIf you Operating System is Windows, type 'ipconfig' in new window termial\nElse if Mac OS or Linux or System included in Uninx, type 'ifconfig' in new window termial\n\nPlease find texture start as 192.168~~ and type: ")
+                        os.system(clear_terminal())
+                        break
+                    else:
+                        print("Please enter keyword Only Y or N")
+                while True:
+                    bool = input("Initializing TTS audio? (Y Recommened) (Y/N): ")
+                    if bool == "Y" or bool == "y" or bool == "Yes" or bool == "y":
+                        os.system(clear_terminal())
+                        asyncio.run(self.TextToSpeech.downloading())
+                        break
+                    elif bool == "N" or bool == "n" or bool == "No" or bool == "no":
+                        os.system(clear_terminal())
+                        break
+                    else:
+                        print("Please enter keyword Only Y or N")
                 break
             else:
-                print("Please enter keyword Only Y or N")
-                os.system(clear_terminal())
+                print("Please enter keyword Only E or K")
+        
         save_dir = "Siosk/package/" # Conversation.json이 있는지 확인하고 없으면 서버에서 다운로드
         download.download_file(file="conversation.json", save_dir=save_dir) # Conversation.json이 있는지 확인하고 없으면 서버에서 다운로드
-        bool_data = find_process_by_port_Voice(9460)
-        if bool_data == True:
+        
+        if ip_address == "127.0.0.1":
+            bool_data = find_process_by_port_Voice(9460)
+            if bool_data == True:
+                self.api = API(
+                    token="SioskKioskFixedTokenVerifyingTokenData",
+                    url=ip_address
+                )
+            elif bool_data == False:
+                self.api = API(
+                    token="SioskKioskFixedTokenVerifyingTokenData",
+                    url="https://anoask.site"
+                )
+        else:
             self.api = API(
                 token="SioskKioskFixedTokenVerifyingTokenData",
-                url="http://127.0.0.1"
-            )
-        elif bool_data == False:
-            self.api = API(
-                token="SioskKioskFixedTokenVerifyingTokenData",
-                url="https://anoask.site"
-            )
+                url=ip_address
+            ) 
         self.api.preparing() # Mic selection, storing class elements declaring as instant variable 
 
     def ask_res(self):
