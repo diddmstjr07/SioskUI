@@ -92,7 +92,7 @@ class UI:
             if bool_data == True:
                 self.api = API(
                     token="SioskKioskFixedTokenVerifyingTokenData",
-                    url=ip_address
+                    url="http://" + ip_address
                 )
             elif bool_data == False:
                 self.api = API(
@@ -102,7 +102,7 @@ class UI:
         else:
             self.api = API(
                 token="SioskKioskFixedTokenVerifyingTokenData",
-                url=ip_address
+                url="http://" + ip_address
             ) 
         self.api.preparing() # Mic selection, storing class elements declaring as instant variable 
 
