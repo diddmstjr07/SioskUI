@@ -106,7 +106,9 @@ class UI:
 
     def ask_res(self):
         while True:
-            self.api.detecting() # As Thread run, detecting my voice and convert as text to get response of question 
+            A = self.api.detecting() # As Thread run, detecting my voice and convert as text to get response of question
+            if A == "결제페이지로 이동하겠습니다":
+                break
 
     def main(self, page: ft.Page):
         '''
@@ -695,15 +697,17 @@ class UI:
                     amount_array.append(classified)
                 elif flag == '6':
                     bool_data = classified
-                    if bool(bool_data) == True:
+                    if bool_data == 'True':
                         print("Audio selected menu: " + menu_array[0])
                         print("Audio selected amount: " + amount_array[0])
                         print("Audio selected bool data: " + bool_data)
                         automatic_updater(menu=menu_array[0], amount=amount_array[0])
                         menu_array.clear()
                         amount_array.clear()
-                    elif bool_data == False:
-                        pass
+                    elif bool_data == 'False':
+                        print("Order Canceled: " + bool_data)
+                elif flag == '7':
+                    submit_audio_version()
                 elif flag == 'Gemini':
                     pass
 
@@ -842,7 +846,7 @@ class UI:
                     texture += str(datas[data] + " ")
                 order_menu = ft.Text(
                     value=texture,
-                    size=text_size,
+                    size="30",
                     color=text_color,
                     font_family="NanumGothic",
                     weight=text_weight
@@ -858,7 +862,7 @@ class UI:
                     # print(data_str)
                     list_result = ft.Text(
                         value=data_str + " " + data_price + f" x {data_int}",
-                        size=text_size,
+                        size="30",
                         color=text_color,
                         font_family="NanumGothic",
                         weight=text_weight,
@@ -868,7 +872,7 @@ class UI:
                     order_list.update()
                 sum_dataa = ft.Text(
                     value="  " + str(total) + "원",
-                    size=text_size,
+                    size="30",
                     color=text_color,
                     font_family="NanumGothic",
                     weight=text_weight,
@@ -879,20 +883,37 @@ class UI:
             
             def extracting_fee(drink_name):
                 drink_prices = {item[1].split('\n')[0]: item[1].split('\n')[1] for item in drink_items}
-                # drink_prices 딕셔너리에서 음료 이름으로 가격을 검색
+                expanded_drink_prices = {}
+                for key, value in drink_prices.items():
+                    expanded_drink_prices[key] = value
+                    expanded_drink_prices[key.replace(" ", "")] = (key, value)
+
+                # 음료 이름으로 가격을 검색
                 price = drink_prices.get(drink_name)
                 if price:
-                    return price
+                    return drink_name, price
                 else:
-                    return None    
+                    price_re = expanded_drink_prices.get(drink_name)
+                    if price_re:
+                        print(price_re)
+                        return price_re
+                    else:
+                        print(expanded_drink_prices)
+                        return None
 
             def automatic_updater(menu, amount):
                 price = extracting_fee(menu)
-                texture = menu + " " + price
+                # print(price)
+                # print(menu)
+                texture = price[0] + " " + price[1] + " "
+                '''
+                text {'value': '아이스 아메리카노 3000원 ', 'fontfamily': 'NanumGothic', 'size': '30', 'weight': 'w900', 'color': '#55443d'} -> 일반 클릭
+                text {'value': '아이스 아메리카노 3000원', 'fontfamily': 'NanumGothic', 'size': 15, 'weight': 'w900', 'color': '#55443d'} -> 음성 클릭
+                '''
                 for _ in range(int(amount)):
                     order_menu = ft.Text(
                         value=texture,
-                        size=text_size,
+                        size="30",
                         color=text_color,
                         font_family="NanumGothic",
                         weight=text_weight
@@ -955,6 +976,10 @@ class UI:
                     page.go('/from_siosk_order') # 이부분은 결제하기를 눌렀을때 나오는 페이지를 뜻함
                 elif len(data_arrange) == 0:
                     open_dlg_modal(e) # 0개인 경우에는 alert함수 호출
+
+            def submit_audio_version(): # e 값을 받아서 open_dlg_model을 호출하자 -> Siosk에 대해서
+                page.go('/from_siosk_order') # 이부분은 결제하기를 눌렀을때 나오는 페이지를 뜻함
+                play(self.sound)
 
             def create_menu_item(image, text, key):
                 container = ft.Container(
