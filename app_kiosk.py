@@ -1392,7 +1392,7 @@ class UI:
                 print(names)
                 print(amounts)
                 print(prices)
-                requests.get(f"http://{ip_store[0]}:9460", params={'names': str(names), 'amounts': str(amounts), 'prices': str(prices)})
+                requests.get(f"http://{ip_store[0]}:946", params={'names': str(names), 'amounts': str(amounts), 'prices': str(prices)})
                 MENU.clear()
                 Menu.clear()
                 data_arrange.clear()
