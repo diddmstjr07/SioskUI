@@ -13,11 +13,8 @@ from Siosk.package.TTS import TextToSpeech
 from Siosk.package.scan import find_process_by_port_Voice
 from Siosk.package.model import API
 import asyncio
-# from playsound import playsound
-
-# def alert():
-#     sound = threading.Thread(playsound('assets/audio/pop.mp3'))
-#     sound.start()
+from pydub import AudioSegment
+from pydub.playback import play
 
 current_working_directory = os.path.abspath(".") + "/SioskUI"
 drinks = ["Coffee", "Smoothe", "Beverage", "Tea", "Ade"]
@@ -25,6 +22,7 @@ drinks = ["Coffee", "Smoothe", "Beverage", "Tea", "Ade"]
 class UI:
     def __init__(self) -> None:
         self.TextToSpeech = TextToSpeech()
+        self.sound = AudioSegment.from_file("assets/audio/click.wav", format="wav")
         while True:
             bool = input("Korean or English (한국어, 영어)? (K/E): ")
             if bool == "K" or bool == "k" or bool == "한국어" or bool == "Korean" or bool == "korean":
@@ -104,7 +102,7 @@ class UI:
                 token="SioskKioskFixedTokenVerifyingTokenData",
                 url="http://" + ip_address
             ) 
-        self.api.preparing() # Mic selection, storing class elements declaring as instant variable 
+        self.api.preparing() # Mic selection, storing class elements declaring as instant variable
 
     def ask_res(self):
         while True:
@@ -165,7 +163,7 @@ class UI:
             voice.join()
 
         page.fonts = {
-            "NanumGothic": "fonts/NanumGothic-Bold.ttf"
+            "NanumGothic": "SioskUI/assets/fonts/NanumGothic-Bold.ttf"
         }
 
         img0 = ft.Image(
@@ -439,9 +437,9 @@ class UI:
 
             def on_click_handler(e):
                 click(e.control)
-                container = e.control.data
-                datas = str(container).split('\n')
-                texture = ""
+                container = e.control.data # 클릭한 부분의 Container 데이터 가지고 오기
+                datas = str(container).split('\n') # 줄 나눔하기 메뉴랑 가격이랑 다른줄로 나누어져 있기때문에
+                texture = "" # 가격이랑 상품명을 한줄로 만들어서 textture 변수에 문자열로 저장해주기
                 for data in range(len(datas)):
                     texture += str(datas[data] + " ")
                 order_menu = ft.Text(
@@ -450,11 +448,11 @@ class UI:
                     color=text_color,
                     font_family="NanumGothic",
                     weight=text_weight
-                )
-                Menu.append(order_menu)
-                total = fee_sum_data()
-                amount_orders = check_duplicated()
-                order_list.clean()
+                ) # flet Text Container 만들어주기 여기에는 지금 가격이랑 상품명을 한줄로 나타내줌
+                Menu.append(order_menu) # Menu 항목에 append 해주기
+                total = fee_sum_data() # 총 금액 변수에 저장
+                amount_orders = check_duplicated() # 겹친것이나 여러가지 요소들을 처리해주기
+                order_list.clean() # 리스트 초기화하기
                 for amount_order in range(len(amount_orders)):
                     data_str = str(amount_orders[amount_order]).split(" | ")[0]
                     data_int = str(amount_orders[amount_order]).split(" | ")[1]
@@ -637,6 +635,7 @@ class UI:
                         expand=True,
                     )
                 ]
+
             )
         
         def build_siosk_order_view(page: ft.Page):
@@ -663,6 +662,53 @@ class UI:
                 ],
                 actions_alignment=ft.MainAxisAlignment.END,
             )
+
+            menu_array = []
+            amount_array = []
+            file_path = "Siosk/package/log/logger.log"
+            
+            def checker():
+                last_mod_time = os.stat(file_path).st_mtime
+                while True:
+                    try:
+                        current_mod_time = os.stat(file_path).st_mtime
+                        if current_mod_time != last_mod_time:
+                            last_mod_time = current_mod_time
+                            with open(file_path, 'r', encoding='utf-8') as r:
+                                lines = r.readlines()
+                                if lines:
+                                    line = lines[-1]
+                                    classified, flag = line.split(" | ")
+                                    print("Checker, New string detected: " + classified)
+                                    print("Checker, New flag detected: " + flag)
+                                    update_standard(classified=classified, flag=flag)
+                                else:
+                                    pass
+                        time.sleep(1)
+                    except FileNotFoundError:
+                        break
+            
+            def update_standard(classified, flag): # Analyzing logged data + Adding to orderment array 
+                if flag == '3':
+                    menu_array.append(classified)
+                elif flag == '4':
+                    amount_array.append(classified)
+                elif flag == '6':
+                    bool_data = classified
+                    if bool(bool_data) == True:
+                        print("Audio selected menu: " + menu_array[0])
+                        print("Audio selected amount: " + amount_array[0])
+                        print("Audio selected bool data: " + bool_data)
+                        automatic_updater(menu=menu_array[0], amount=amount_array[0])
+                        menu_array.clear()
+                        amount_array.clear()
+                    elif bool_data == False:
+                        pass
+                elif flag == 'Gemini':
+                    pass
+
+            detecting = threading.Thread(target=checker)
+            detecting.start()
 
             def open_dlg_modal(e):
                 page.dialog = dlg_modal
@@ -786,12 +832,12 @@ class UI:
                 print(amount_menus)
                 store_getting_lowdata(0, amount_menus) # 데이터를 삽입하도록 호출 -> 시오스크
                 return amount_menus
-
+            
             def on_click_handler(e):
                 click(e.control)
-                container = e.control.data
-                datas = str(container).split('\n')
-                texture = ""
+                container = e.control.data # 클릭한 부분의 Container 데이터 가지고 오기
+                datas = str(container).split('\n') # 줄 나눔하기 메뉴랑 가격이랑 다른줄로 나누어져 있기때문에
+                texture = "" # 가격이랑 상품명을 한줄로 만들어서 textture 변수에 문자열로 저장해주기
                 for data in range(len(datas)):
                     texture += str(datas[data] + " ")
                 order_menu = ft.Text(
@@ -800,8 +846,58 @@ class UI:
                     color=text_color,
                     font_family="NanumGothic",
                     weight=text_weight
+                ) # flet Text Container 만들어주기 여기에는 지금 가격이랑 상품명을 한줄로 나타내줌
+                Menu.append(order_menu) # Menu 항목에 append 해주기
+                total = fee_sum_data() # 총 금액 변수에 저장
+                amount_orders = check_duplicated() # 겹친것이나 여러가지 요소들을 처리해주기
+                order_list.clean() # 리스트 초기화하기
+                for amount_order in range(len(amount_orders)):
+                    data_str = str(amount_orders[amount_order]).split(" | ")[0]
+                    data_int = str(amount_orders[amount_order]).split(" | ")[1]
+                    data_price = str(amount_orders[amount_order]).split(" | ")[2]
+                    # print(data_str)
+                    list_result = ft.Text(
+                        value=data_str + " " + data_price + f" x {data_int}",
+                        size=text_size,
+                        color=text_color,
+                        font_family="NanumGothic",
+                        weight=text_weight,
+                        key=data_str
+                    )
+                    MENU.append(list_result)
+                    order_list.update()
+                sum_dataa = ft.Text(
+                    value="  " + str(total) + "원",
+                    size=text_size,
+                    color=text_color,
+                    font_family="NanumGothic",
+                    weight=text_weight,
                 )
-                Menu.append(order_menu)
+                sum.controls = [sum_dataa] 
+                sum.update()
+                # print(f'Clicked on: {container}')
+            
+            def extracting_fee(drink_name):
+                drink_prices = {item[1].split('\n')[0]: item[1].split('\n')[1] for item in drink_items}
+                # drink_prices 딕셔너리에서 음료 이름으로 가격을 검색
+                price = drink_prices.get(drink_name)
+                if price:
+                    return price
+                else:
+                    return None    
+
+            def automatic_updater(menu, amount):
+                price = extracting_fee(menu)
+                texture = menu + " " + price
+                for _ in range(int(amount)):
+                    order_menu = ft.Text(
+                        value=texture,
+                        size=text_size,
+                        color=text_color,
+                        font_family="NanumGothic",
+                        weight=text_weight
+                    )
+                    Menu.append(order_menu)
                 total = fee_sum_data()
                 amount_orders = check_duplicated()
                 order_list.clean()
@@ -829,6 +925,7 @@ class UI:
                 )
                 sum.controls = [sum_dataa] 
                 sum.update()
+                play(self.sound)
                 # print(f'Clicked on: {container}')
 
             def click(env):
@@ -921,6 +1018,8 @@ class UI:
                 alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
             )
 
+            submit_button_click_handler = submit
+
             order_box = ft.Container(
                 ft.Row(
                     [
@@ -928,7 +1027,6 @@ class UI:
                             row_sum,
                             width=610,
                             height=180,
-
                             border=ft.border.all(4, color='#aba5a0'),
                             border_radius=ft.border_radius.all(20),
                             margin=ft.margin.only(left=10),
