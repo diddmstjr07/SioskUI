@@ -108,6 +108,7 @@ class UI:
         while True:
             A = self.api.detecting() # As Thread run, detecting my voice and convert as text to get response of question
             if A == "결제페이지로 이동하겠습니다":
+                print("Breaking")
                 break
 
     def main(self, page: ft.Page):
@@ -668,14 +669,21 @@ class UI:
             menu_array = []
             amount_array = []
             file_path = "Siosk/package/log/logger.log"
-            
             def checker():
-                last_mod_time = os.stat(file_path).st_mtime
+                def counting():
+                    file = open(file_path, 'r')
+                    line_count = 0
+                    try:
+                        for line in file:
+                            line_count += 1
+                        return line_count
+                    finally:
+                        file.close()
+                cnt_start = counting()
                 while True:
                     try:
-                        current_mod_time = os.stat(file_path).st_mtime
-                        if current_mod_time != last_mod_time:
-                            last_mod_time = current_mod_time
+                        cnt = counting()
+                        if cnt != cnt_start:
                             with open(file_path, 'r', encoding='utf-8') as r:
                                 lines = r.readlines()
                                 if lines:
@@ -683,12 +691,21 @@ class UI:
                                     classified, flag = line.split(" | ")
                                     print("Checker, New string detected: " + classified)
                                     print("Checker, New flag detected: " + flag)
-                                    update_standard(classified=classified, flag=flag)
+                                    try:
+                                        hint = update_standard(classified=classified, flag=flag)
+                                        if hint == False:
+                                            break
+                                    except:
+                                        pass
                                 else:
                                     pass
+                        cnt_start = cnt
                         time.sleep(1)
                     except FileNotFoundError:
                         break
+
+            detecting = threading.Thread(target=checker)
+            detecting.start()
             
             def update_standard(classified, flag): # Analyzing logged data + Adding to orderment array 
                 if flag == '3':
@@ -708,11 +725,11 @@ class UI:
                         print("Order Canceled: " + bool_data)
                 elif flag == '7':
                     submit_audio_version()
+                    with open('Siosk/package/log/logger.log', 'w', encoding='utf-8') as file:
+                        pass
+                    return False
                 elif flag == 'Gemini':
                     pass
-
-            detecting = threading.Thread(target=checker)
-            detecting.start()
 
             def open_dlg_modal(e):
                 page.dialog = dlg_modal
@@ -1374,6 +1391,9 @@ class UI:
                 print(amounts)
                 print(prices)
                 requests.get("http://127.0.0.1:9460", params={'names': str(names), 'amounts': str(amounts), 'prices': str(prices)})
+                MENU.clear()
+                Menu.clear()
+                data_arrange.clear()
                 page.go('/')
 
             return View(
@@ -1481,7 +1501,7 @@ class UI:
                                     ),
                                     height=200,
                                     alignment=ft.alignment.center,
-                                    margin=ft.margin.only(top=60)
+                                    margin=ft.margin.only(top=45)
                                 )
                                 # ft.Container(
                                 #     ft.TextButton("/admininstrator_page", on_click=lambda _: page.go('/admininstrator_page')),
@@ -1568,6 +1588,6 @@ class UI:
             elif page.route == "/from_siosk_order":
                 page.views.append(from_siosk_order())
             page.update()
-
+        
         page.on_route_change = route_change
         page.go(page.route)
