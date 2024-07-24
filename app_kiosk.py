@@ -18,6 +18,7 @@ from pydub.playback import play
 
 current_working_directory = os.path.abspath(".") + "/SioskUI"
 drinks = ["Coffee", "Smoothe", "Beverage", "Tea", "Ade"]
+ip_store = []
 
 class UI:
     def __init__(self) -> None:
@@ -84,7 +85,8 @@ class UI:
         
         save_dir = "Siosk/package/" # Conversation.json이 있는지 확인하고 없으면 서버에서 다운로드
         download.download_file(file="conversation.json", save_dir=save_dir) # Conversation.json이 있는지 확인하고 없으면 서버에서 다운로드
-        
+        ip_store.append(ip_address)
+
         if ip_address == "127.0.0.1":
             bool_data = find_process_by_port_Voice(9460)
             if bool_data == True:
@@ -671,7 +673,7 @@ class UI:
             file_path = "Siosk/package/log/logger.log"
             def checker():
                 def counting():
-                    file = open(file_path, 'r')
+                    file = open(file_path, 'r', encoding='utf-8')
                     line_count = 0
                     try:
                         for line in file:
@@ -1390,7 +1392,7 @@ class UI:
                 print(names)
                 print(amounts)
                 print(prices)
-                requests.get("http://127.0.0.1:9460", params={'names': str(names), 'amounts': str(amounts), 'prices': str(prices)})
+                requests.get(f"http://{ip_store[0]}:9460", params={'names': str(names), 'amounts': str(amounts), 'prices': str(prices)})
                 MENU.clear()
                 Menu.clear()
                 data_arrange.clear()
