@@ -22,7 +22,7 @@ def build_siosk_order_view(
         Menu: list,
         drink_items: dict,
         key_data: list,
-        store_getting_lowdata: Callable[[], None],
+        store_getting_lowdata: Callable[[], None], 
         data_arrange: list,
         current_working_directory: str,
         sound,
