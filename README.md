@@ -18,7 +18,7 @@
 <br> <p align="center"> <img src="assets/siosk_display_1.png" alt="이미지" style="border-radius: 20px; margin-right: 40px;"> <img src="assets/siosk_display_2.png" alt="이미지" style="border-radius: 20px;"> </p>
 <br><p style="font-size: 24px;">Siosk 사용 방법</p>
 
-    -> setup.exe와 main.exe를 더블 클릭하면 세 개의 창이 나타납니다.
+    -> setup.exe와 main.exe를 더블 클릭하면 세 개의 창이 나타납니다. 
 
     -> 1. 키오스크 사용자 인터페이스 화면
     -> 2. 클라이언트-백엔드 콘솔 창
