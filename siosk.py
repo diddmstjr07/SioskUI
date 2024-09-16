@@ -14,7 +14,7 @@ from SioskUI.siosk_senior_order import from_siosk_order
 from Siosk.package.model import API
 import sys
 import requests
-import os
+import os 
 
 current_working_directory = os.path.abspath(".") + "/SioskUI"
 drinks = ["Coffee", "Smoothe", "Beverage", "Tea", "Ade"]
