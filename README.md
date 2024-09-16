@@ -36,4 +36,10 @@
     Q. 알겠습니다 A. ~~~~
     Q. 결제할게요 A. ~~~~
 
-<br> <p style="font-size: 24px;">소개 영상</p> <p align="center"> <a href="https://youtu.be/6tZnWgnzza4"> <img src="assets/thumnail.png" alt="이미지" style="border-radius: 20px;"> </a> </p>
+<br>
+<p style="font-size: 24px;">소개 영상</p>
+<p align="center">
+    <a href="https://youtu.be/6tZnWgnzza4">
+        <img src="assets/thumnail.png" alt="이미지" style="border-radius: 20px; width: 500px; height: auto;">
+    </a>
+</p>
