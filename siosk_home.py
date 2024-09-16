@@ -13,7 +13,7 @@ def build_home_view(
 
     def ask_res():
         while True:
-            A = api.detecting() # As Thread run, detecting my voice and convert as text to get response of question
+            A = api.detecting() # As Thread run, detecting my voice and convert as text to get response of question 
             if A == "결제페이지로 이동하겠습니다":
                 print("Breaking")
                 break
